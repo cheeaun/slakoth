@@ -73,3 +73,10 @@ const postEvents = async () => {
 // postEvents();
 
 new CronJob('0 0 11 * * 1-6', postEvents, null, true, 'Asia/Singapore');
+
+const http = require('http');
+http.createServer((req, res) => {
+  res.setHeader('content-type', 'text/plain');
+  res.statusCode = 200;
+  res.end('https://github.com/cheeaun/slakoth');
+}).listen(process.env.PORT || 1337);
