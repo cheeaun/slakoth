@@ -16,14 +16,15 @@
     "@slack/client": "~4.4.0",
     "cron": "~1.4.0",
     "dotenv": "~6.0.0",
-    "got": "~9.0.0"
+    "got": "~9.0.0",
+    "spacetime": "~4.3.0"
   },
   "now": {
     "alias": "slakoth",
-    "env": [
-      "SLACK_TOKEN",
-      "SLACK_CHANNEL"
-    ],
+    "env": {
+      "SLACK_TOKEN": "@webuild-slack-bot-token",
+      "SLACK_CHANNEL": "@slack-channel"
+    },
     "scale": {
       "sfo1": {
         "min": 1,
