@@ -3,7 +3,7 @@ Slakoth
 
 <img src="slakoth.png" width="320" height="320" alt="">
 
-> A Slack bot that auto-post daily events from [We Build SG](http://webuild.sg/).
+> A Slack bot that auto-post daily tech events in Singapore.
 
 Technicalities
 ---
