@@ -15,15 +15,15 @@ var webuildColors = ['#c11a18', '#e06149', '#228dB7', '#f1e9b4'];
 
 const generateMessage = async () => {
   const nowDate = spacetime.now('Asia/Singapore');
-  const newEventsResponse = await got('http://api-webuild.7e14.starter-us-west-2.openshiftapps.com/events', {
+  const newEventsResponse = await got('https://engineers.sg/api/events', {
     json: true,
   });
-  const oldEventsResponse = await got('https://webuild.sg/api/v1/events', {
-    json: true,
-  });
+  // const oldEventsResponse = await got('https://webuild.sg/api/v1/events', {
+  //   json: true,
+  // });
   const events = [
     ...newEventsResponse.body.events,
-    ...oldEventsResponse.body.events
+    // ...oldEventsResponse.body.events
   ].sort((a, b) => new Date(a.start_time) - new Date(b.start_time))
     .filter((ev, i) => {
       const eventDate = spacetime(ev.start_time);
@@ -43,15 +43,15 @@ const generateMessage = async () => {
       title: event.name,
       title_link: event.url,
       color: cycle(webuildColors),
-      text: `by *${groupName}* on *${datetime}\n${location}`
+      text: `by *${groupName}* on *${datetime}*\n${location}`
     };
   });
 
   const msg = events.length ? {
-    text: `📢 ${events.length} event${events.length == 1 ? '' : 's'} today from We Build SG https://webuild.sg/`,
+    text: `📢 *${events.length}* tech event${events.length == 1 ? '' : 's'} today`,
     attachments,
   } : {
-    text: '😭 No events today from We Build SG https://webuild.sg/',
+    text: '😭 No tech events today',
   };
 
   return msg;
