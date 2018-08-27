@@ -13,16 +13,15 @@
   "author": "Lim Chee Aun",
   "license": "ISC",
   "dependencies": {
-    "@slack/client": "~4.4.0",
-    "cron": "~1.4.0",
+    "@slack/client": "~4.5.0",
     "dotenv": "~6.0.0",
-    "got": "~9.0.0",
+    "got": "~9.1.0",
     "spacetime": "~4.3.0"
   },
   "now": {
     "alias": "slakoth",
     "env": {
-      "SLACK_TOKEN": "@webuild-slack-bot-token",
+      "SLACK_TOKEN": "@slack-bot-token",
       "SLACK_CHANNEL": "@slack-channel"
     },
     "scale": {

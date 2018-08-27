@@ -1,9 +1,10 @@
 require('dotenv').config();
 const got = require('got');
 const spacetime = require('spacetime')
-const CronJob = require('cron').CronJob;
 const { WebClient } = require('@slack/client');
 const web = new WebClient(process.env.SLACK_TOKEN);
+
+const TIMEZONE = 'Asia/Singapore';
 
 var cycleIndex = 0;
 var cycle = function(list){
@@ -14,7 +15,7 @@ var cycle = function(list){
 var webuildColors = ['#c11a18', '#e06149', '#228dB7', '#f1e9b4'];
 
 const generateMessage = async () => {
-  const nowDate = spacetime.now('Asia/Singapore');
+  const nowDate = spacetime.now(TIMEZONE);
   const newEventsResponse = await got('https://engineers.sg/api/events', {
     json: true,
   });
@@ -27,7 +28,7 @@ const generateMessage = async () => {
   ].sort((a, b) => new Date(a.start_time) - new Date(b.start_time))
     .filter((ev, i) => {
       const eventDate = spacetime(ev.start_time);
-      eventDate.goto('Asia/Singapore');
+      eventDate.goto(TIMEZONE);
       if (i == 0) console.log(nowDate.format('iso-short'), '↔️ ', eventDate.format('iso-short'));
       return nowDate.format('iso-short') == eventDate.format('iso-short');
     })
@@ -35,7 +36,7 @@ const generateMessage = async () => {
 
   const attachments = events.map((event) => {
     const dt = spacetime(event.start_time);
-    dt.goto('Asia/Singapore');
+    dt.goto(TIMEZONE);
     const datetime = dt.format('nice-day');
     const groupName = event.group_name.trim().replace(/\*/g, '٭­');
     const location = event.location.trim().replace(/\*/g, '٭');
@@ -69,7 +70,31 @@ const postEvents = async () => {
     .catch(console.error);
 };
 
-new CronJob('0 0 11 * * 1-6', postEvents, null, true, 'Asia/Singapore');
+const schedulePost = () => {
+  const now = spacetime.now(TIMEZONE);
+  const scheduledToday = spacetime.now(TIMEZONE).hour(10).nearest('hour'); // 10 AM today
+  if (now.isBefore(scheduledToday)){
+    const diff = now.diff(scheduledToday);
+    setTimeout(() => {
+      postEvents();
+      setTimeout(schedulePost, 5000);
+    }, Math.abs(diff.milliseconds));
+    console.log(`${now.format('nice')} - Posting in next ${diff.minutes} minutes(s).`);
+  } else if (now.isAfter(scheduledToday)) {
+    const scheduledTomorrow = spacetime.tomorrow(TIMEZONE).hour(10).nearest('hour'); // 10 AM tomorrow
+    const diff = now.diff(scheduledTomorrow);
+    setTimeout(() => {
+      postEvents();
+      setTimeout(schedulePost, 5000);
+    }, Math.abs(diff.milliseconds));
+    console.log(`${now.format('nice')} - Posting in next ${diff.hours} hour(s).`);
+  } else { // Exactly on time!
+    postEvents();
+    setTimeout(schedulePost, 5000);
+    console.log(`${now.format('nice')} - Posting NOW!`);
+  }
+};
+schedulePost();
 
 const http = require('http');
 http.createServer(async (req, res) => {
