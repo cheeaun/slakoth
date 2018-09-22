@@ -15,23 +15,7 @@
   "dependencies": {
     "@slack/client": "~4.6.0",
     "dotenv": "~6.0.0",
-  },
-  "now": {
-    "alias": "slakoth",
-    "env": {
-      "SLACK_TOKEN": "@slack-bot-token",
-      "SLACK_CHANNEL": "@slack-channel"
-    },
-    "scale": {
-      "sfo1": {
-        "min": 1,
-        "max": 1
-      }
-    },
-    "files": [
-      "server.js",
-      "package.json",
-      "package-lock.json"
-    ]
+    "got": "~9.2.2",
+    "spacetime": "~4.4.0"
   }
 }

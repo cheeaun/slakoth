@@ -1,0 +1,18 @@
+{
+  "alias": "slakoth",
+  "env": {
+    "SLACK_TOKEN": "@slack-bot-token",
+    "SLACK_CHANNEL": "@slack-channel"
+  },
+  "scale": {
+    "sfo1": {
+      "min": 1,
+      "max": 1
+    }
+  },
+  "files": [
+    "server.js",
+    "package.json",
+    "package-lock.json"
+  ]
+}
