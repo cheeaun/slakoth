@@ -16,5 +16,8 @@
     "dotenv": "~6.0.0",
     "got": "~9.2.2",
     "spacetime": "~4.4.0"
+  },
+  "scripts": {
+    "start": "node server.js"
   }
 }
