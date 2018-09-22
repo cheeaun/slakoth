@@ -2,7 +2,6 @@
   "name": "slakoth",
   "version": "0.0.1",
   "description": "Slack bot to auto-post tech events in Singapore",
-  "main": "index.js",
   "keywords": [
     "slack",
     "bot",
