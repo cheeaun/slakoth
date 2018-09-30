@@ -37,19 +37,19 @@ const generateMessage = async () => {
   const attachments = events.map((event) => {
     const dt = spacetime(event.start_time);
     dt.goto(TIMEZONE);
-    const datetime = dt.format('nice-day');
+    const time = dt.format('time');
     const groupName = event.group_name.trim().replace(/\*/g, '٭­');
     const location = event.location.trim().replace(/\*/g, '٭');
     return {
       title: event.name,
       title_link: event.url,
       color: cycle(webuildColors),
-      text: `by *${groupName}* on *${datetime}*\n${location}`
+      text: `at *${time}* by ${groupName}\n${location}`
     };
   });
 
   const msg = events.length ? {
-    text: `📢 *${events.length}* tech event${events.length == 1 ? '' : 's'} today`,
+    text: `📢 *${events.length}* tech event${events.length == 1 ? '' : 's'} today!`,
     attachments,
   } : {
     text: '😭 No tech events today',
