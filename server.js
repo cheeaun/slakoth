@@ -28,16 +28,14 @@ const generateMessage = async () => {
     // ...oldEventsResponse.body.events
   ].sort((a, b) => new Date(a.start_time) - new Date(b.start_time))
     .filter((ev, i) => {
-      const eventDate = spacetime(ev.start_time);
-      eventDate.goto(TIMEZONE);
+      const eventDate = spacetime(ev.start_time).goto(TIMEZONE);
       if (i == 0) console.log(nowDate.format('iso-short'), '↔️ ', eventDate.format('iso-short'));
       return nowDate.format('iso-short') == eventDate.format('iso-short');
     })
     .slice(0, 15);
 
   const attachments = events.map((event) => {
-    const dt = spacetime(event.start_time);
-    dt.goto(TIMEZONE);
+    const dt = spacetime(event.start_time).goto(TIMEZONE);
     const time = dt.format('time');
     const groupName = event.group_name.trim().replace(/\*/g, '٭­');
     const location = event.location.trim().replace(/\*/g, '٭');
