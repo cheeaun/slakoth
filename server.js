@@ -1,9 +1,10 @@
 require('dotenv').config();
 const got = require('got');
 const spacetime = require('spacetime')
-const { WebClient } = require('@slack/client');
+const { WebClient } = require('@slack/web-api');
 const web = new WebClient(process.env.SLACK_TOKEN);
 
+const isDev = !process.env.NOW_REGION;
 const TIMEZONE = 'Asia/Singapore';
 
 var cycleIndex = 0;
@@ -58,59 +59,70 @@ const generateMessage = async () => {
   return msg;
 }
 
-const postEvents = async () => {
+const postEvents = async (channel) => {
   const msg = await generateMessage();
-  web.chat.postMessage({
-    channel: process.env.SLACK_CHANNEL,
+  const res = await web.chat.postMessage({
+    channel: channel || process.env.SLACK_CHANNEL,
     ...msg,
-  })
-    .then((res) => {
-      console.log('Message sent: ', res.ok, res.ts);
-    })
-    .catch(console.error);
+  });
+  console.log('Message sent: ', res.ok, res.ts);
 };
 
-const schedulePost = () => {
-  const now = spacetime.now(TIMEZONE);
-  const scheduledToday = spacetime.now(TIMEZONE).hour(10).nearest('hour'); // 10 AM today
-  if (now.isBefore(scheduledToday)){
-    const diff = now.diff(scheduledToday);
-    setTimeout(() => {
-      postEvents();
-      setTimeout(schedulePost, 5000);
-    }, Math.abs(diff.milliseconds));
-    console.log(`${now.format('nice')} - Posting in next ${diff.minutes} minutes(s).`);
-  } else if (now.isAfter(scheduledToday)) {
-    const scheduledTomorrow = spacetime.tomorrow(TIMEZONE).hour(10).nearest('hour'); // 10 AM tomorrow
-    const diff = now.diff(scheduledTomorrow);
-    setTimeout(() => {
-      postEvents();
-      setTimeout(schedulePost, 5000);
-    }, Math.abs(diff.milliseconds));
-    console.log(`${now.format('nice')} - Posting in next ${diff.hours} hour(s).`);
-  } else { // Exactly on time!
-    postEvents();
-    setTimeout(schedulePost, 5000);
-    console.log(`${now.format('nice')} - Posting NOW!`);
-  }
-};
-schedulePost();
+// const schedulePost = () => {
+//   const now = spacetime.now(TIMEZONE);
+//   const scheduledToday = spacetime.now(TIMEZONE).hour(10).nearest('hour'); // 10 AM today
+//   if (now.isBefore(scheduledToday)){
+//     const diff = now.diff(scheduledToday);
+//     setTimeout(() => {
+//       postEvents();
+//       setTimeout(schedulePost, 5000);
+//     }, Math.abs(diff.milliseconds));
+//     console.log(`${now.format('nice')} - Posting in next ${diff.minutes} minutes(s).`);
+//   } else if (now.isAfter(scheduledToday)) {
+//     const scheduledTomorrow = spacetime.tomorrow(TIMEZONE).hour(10).nearest('hour'); // 10 AM tomorrow
+//     const diff = now.diff(scheduledTomorrow);
+//     setTimeout(() => {
+//       postEvents();
+//       setTimeout(schedulePost, 5000);
+//     }, Math.abs(diff.milliseconds));
+//     console.log(`${now.format('nice')} - Posting in next ${diff.hours} hour(s).`);
+//   } else { // Exactly on time!
+//     postEvents();
+//     setTimeout(schedulePost, 5000);
+//     console.log(`${now.format('nice')} - Posting NOW!`);
+//   }
+// };
+// schedulePost();
 
-const http = require('http');
-http.createServer(async (req, res) => {
+const handler = async (req, res) => {
+  const url = require('url').parse(req.url, true);
   if (req.url == '/'){
     const msg = await generateMessage();
     res.setHeader('content-type', 'application/json');
     res.statusCode = 200;
     res.end(JSON.stringify(msg, null, '\t'));
-  } else if (req.url == '/post'){
-    await postEvents();
+  } else if (url.pathname == '/post'){
+    const { channel } = url.query;
     res.setHeader('content-type', 'text/plain');
     res.statusCode = 200;
-    res.end('Posted message to channel');
+    try {
+      await postEvents(channel);
+      res.end('Posted message to channel' + (channel ? ` (${channel})` : ''));
+    } catch (e) {
+      console.log(e);
+      res.end('Error: ' + e.message ? e.message : String(e));
+    }
   } else {
     res.setHeader('content-type', 'text/plain');
     res.statusCode = 404;
     res.end('404');
   }
-}).listen(process.env.PORT || 1337);
+}
+
+exports.default = handler;
+
+if (isDev) {
+  const PORT = process.env.PORT || 1337;
+  const listen = () => console.log(`Listening on ${PORT}...`);
+  require('http').createServer(handler).listen(PORT, listen);
+}
