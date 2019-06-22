@@ -93,8 +93,10 @@ const postEvents = async (channel) => {
 // schedulePost();
 
 const handler = async (req, res) => {
+  const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress || (req.connection.socket ? req.connection.socket.remoteAddress : null);
+  console.log(`${req.method} ${req.url} - ${ip} - ${req.headers['user-agent']}`);
   const url = require('url').parse(req.url, true);
-  if (req.url == '/'){
+  if (url.pathname == '/'){
     const msg = await generateMessage();
     res.setHeader('content-type', 'application/json');
     res.statusCode = 200;
