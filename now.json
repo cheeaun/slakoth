@@ -7,10 +7,12 @@
     "SLACK_CHANNEL": "@slack-channel"
   },
   "builds": [
+    { "src": "index.html", "use": "@now/static" },
     { "src": "server.js", "use": "@now/node" }
   ],
   "routes": [
+    { "src": "/", "dest": "/index.html" },
     { "src": "/favicon.ico", "status": 204 },
-    { "src": "/(.*)", "dest": "/server.js" }
+    { "src": "/(.+)", "dest": "/server.js" }
   ]
 }

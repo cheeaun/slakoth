@@ -1,4 +1,5 @@
 require('dotenv').config();
+const fs = require('fs');
 const got = require('got');
 const spacetime = require('spacetime')
 const { WebClient } = require('@slack/web-api');
@@ -97,6 +98,10 @@ const handler = async (req, res) => {
   console.log(`${req.method} ${req.url} - ${ip} - ${req.headers['user-agent']}`);
   const url = require('url').parse(req.url, true);
   if (url.pathname == '/'){
+    res.setHeader('content-type', 'text/html');
+    res.statusCode = 200;
+    res.end(fs.readFileSync('index.html'));
+  } else if (url.pathname == '/events'){
     const msg = await generateMessage();
     res.setHeader('content-type', 'application/json');
     res.statusCode = 200;

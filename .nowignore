@@ -1,4 +1,5 @@
 *
+!index.html
 !server.js
 !package.json
 !package-lock.json
