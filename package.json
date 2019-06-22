@@ -15,7 +15,7 @@
     "@slack/web-api": "~5.0.1",
     "dotenv": "~8.0.0",
     "got": "~9.6.0",
-    "spacetime": "~5.8.2"
+    "spacetime": "~5.9.0"
   },
   "scripts": {
     "start": "node server.js"
