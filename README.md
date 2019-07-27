@@ -10,7 +10,7 @@ Notes
 
 This runs as a serverless instance but also can run as a normal server.
 
-As of May 2019, it doesn't run its internal "cron-job" anymore. The auto-post part is triggered by a job on [EasyCron](https://www.easycron.com/) instead. The `/post` endpoint will post to the configured Slack channel.
+As of May 2019, it doesn't run its internal "cron-job" anymore. The auto-post part is triggered by a job on [Cronless](https://cronless.com/) instead. The `/post` endpoint will post to the configured Slack channel.
 
 Technicalities
 ---
