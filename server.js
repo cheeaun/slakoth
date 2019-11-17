@@ -40,7 +40,7 @@ const generateMessage = async () => {
     const time = dt.format('time');
     const groupName = event.group_name.trim().replace(/\*/g, '٭­');
     const location = event.location.trim().replace(/\*/g, '٭');
-    const shortLocation = location.split(/[\s\t\n\r,]/, 1)[0];
+    const shortLocation = location.split(',', 1)[0].trim();
     let contextText = `*${time}*`;
     if (location) contextText += ` - <https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}|${shortLocation}>`;
     contextText += ` - ${groupName}`;
