@@ -18,6 +18,7 @@
     "spacetime": "~6.3.0"
   },
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "post": "node server.js --post"
   }
 }

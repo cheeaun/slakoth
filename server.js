@@ -40,16 +40,44 @@ const generateMessage = async () => {
     const time = dt.format('time');
     const groupName = event.group_name.trim().replace(/\*/g, '٭­');
     const location = event.location.trim().replace(/\*/g, '٭');
+    const shortLocation = location.split(/[\s\t\n\r,]/, 1)[0];
+    let contextText = `*${time}*`;
+    if (location) contextText += ` - <https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}|${shortLocation}>`;
+    contextText += ` - ${groupName}`;
     return {
-      title: event.name,
-      title_link: event.url,
+      blocks: [
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: `*<${event.url}|${event.name}>*`,
+          },
+        },
+        {
+          type: 'context',
+          elements: [
+            {
+              type: 'mrkdwn',
+              text: contextText,
+            },
+          ],
+        },
+      ],
       color: cycle(webuildColors),
-      text: `at *${time}* by ${groupName}\n${location}`
     };
   });
 
   const msg = events.length ? {
     text: `📢 *${events.length}* tech event${events.length == 1 ? '' : 's'} today!`,
+    blocks: [
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `📢 *${events.length}* tech event${events.length == 1 ? '' : 's'} <https://engineers.sg/events/|today>!`,
+        },
+      },
+    ],
     attachments,
   } : {
     text: '😭 No tech events today',
@@ -125,6 +153,13 @@ const handler = async (req, res) => {
 }
 
 exports.default = handler;
+
+const [_, __, args] = process.argv;
+if (args === '--post') {
+  postEvents();
+  console.log('Posting message to channel');
+  return;
+}
 
 if (isDev) {
   const PORT = process.env.PORT || 1337;
