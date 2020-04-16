@@ -12,10 +12,10 @@
   "author": "Lim Chee Aun",
   "license": "ISC",
   "dependencies": {
-    "@slack/web-api": "~5.5.0",
+    "@slack/web-api": "~5.8.0",
     "dotenv": "~8.2.0",
-    "got": "~9.6.0",
-    "spacetime": "~6.3.0"
+    "got": "9.6.0",
+    "spacetime": "~6.4.3"
   },
   "scripts": {
     "start": "node server.js",
