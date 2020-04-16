@@ -16,26 +16,54 @@ var cycle = function(list) {
 };
 var webuildColors = ['#c11a18', '#e06149', '#228dB7', '#f1e9b4'];
 
+const blacklistRegex = /(business|marketing|superbowl)/i;
 const generateMessage = async () => {
   const nowDate = spacetime.now(TIMEZONE);
   const newEventsResponse = await got('https://engineers.sg/api/events', {
     json: true,
   });
+  const eventNames = [];
   const events = [...newEventsResponse.body.events]
     .sort((a, b) => new Date(a.start_time) - new Date(b.start_time))
     .filter((ev, i) => {
       const eventDate = spacetime(ev.start_time).goto(TIMEZONE);
-      if (i == 0)
+      if (i == 0) {
         console.log(
-          nowDate.format('iso-short'),
-          '↔️ ',
-          eventDate.format('iso-short'),
+          `${nowDate.format('iso-short')} ↔️ ${eventDate.format('iso-short')}`,
         );
-      return nowDate.format('iso-short') == eventDate.format('iso-short');
+      }
+      const sameDay =
+        nowDate.format('iso-short') == eventDate.format('iso-short');
+
+      const eventName = ev.name.trim();
+
+      const blacklisted =
+        blacklistRegex.test(ev.location) ||
+        blacklistRegex.test(ev.group_name) ||
+        blacklistRegex.test(eventName);
+
+      const eventNameDuplicated =
+        eventName.length > 5 && eventNames.includes(eventName);
+      eventNames.push(eventName);
+
+      return sameDay && !blacklisted && !eventNameDuplicated;
     })
     .slice(0, 15);
 
-  const attachments = events.map(event => {
+  // Filter out the non-200 meetups
+  const aliveEvents = (
+    await Promise.all(
+      events.map(ev =>
+        got(ev.url, {
+          method: 'HEAD',
+          timeout: 1000,
+          retry: 1,
+        }).then(r => (r.statusCode === 200 ? ev : null)),
+      ),
+    )
+  ).filter(ev => ev);
+
+  const attachments = aliveEvents.map(event => {
     const dt = spacetime(event.start_time).goto(TIMEZONE);
     const time = dt.format('time');
     const groupName = event.group_name.trim().replace(/\*/g, '٭­');
@@ -53,7 +81,7 @@ const generateMessage = async () => {
           type: 'section',
           text: {
             type: 'mrkdwn',
-            text: `*<${event.url}|${event.name}>*`,
+            text: `*<${event.url}|${event.name.trim()}>*`,
           },
         },
         {
