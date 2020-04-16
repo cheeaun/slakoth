@@ -122,7 +122,7 @@ const handler = async (req, res) => {
     const msg = await generateMessage();
     res.setHeader('content-type', 'application/json');
     res.statusCode = 200;
-    res.end(JSON.stringify(msg, null, '\t'));
+    res.end(JSON.stringify(msg, null, ' '));
   } else if (url.pathname == '/post') {
     const { channel } = url.query;
     res.setHeader('content-type', 'text/plain');
