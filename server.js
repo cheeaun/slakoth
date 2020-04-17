@@ -22,7 +22,6 @@ const generateMessage = async () => {
   const newEventsResponse = await got('https://engineers.sg/api/events', {
     json: true,
   });
-  const eventNames = [];
   const events = [...newEventsResponse.body.events]
     .sort((a, b) => new Date(a.start_time) - new Date(b.start_time))
     .filter((ev, i) => {
@@ -35,18 +34,15 @@ const generateMessage = async () => {
       const sameDay =
         nowDate.format('iso-short') == eventDate.format('iso-short');
 
-      const eventName = ev.name.trim();
-
       const blacklisted =
         blacklistRegex.test(ev.location) ||
         blacklistRegex.test(ev.group_name) ||
-        blacklistRegex.test(eventName);
+        blacklistRegex.test(ev.name);
 
-      const eventNameDuplicated =
-        eventName.length > 5 && eventNames.includes(eventName);
-      eventNames.push(eventName);
+      const significantRSVPCount = ev.rsvp_count > 2;
 
-      return sameDay && !blacklisted && !eventNameDuplicated;
+      const legit = sameDay && !blacklisted && significantRSVPCount;
+      return legit;
     })
     .slice(0, 15);
 
