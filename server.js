@@ -16,7 +16,7 @@ var cycle = function(list) {
 };
 var webuildColors = ['#c11a18', '#e06149', '#228dB7', '#f1e9b4'];
 
-const blacklistRegex = /(business|marketing|superbowl)/i;
+const blacklistRegex = /(business|marketing|superbowl|blockchain)/i;
 const generateMessage = async () => {
   const nowDate = spacetime.now(TIMEZONE);
   const newEventsResponse = await got('https://engineers.sg/api/events', {
