@@ -130,18 +130,20 @@ const generateMessage = async () => {
     };
   });
 
-  const msg = events.length
+  const eventsCount = aliveEvents.length;
+
+  const msg = eventsCount
     ? {
-        text: `📢 *${events.length}* tech event${
-          events.length == 1 ? '' : 's'
+        text: `📢 *${eventsCount}* tech event${
+          eventsCount == 1 ? '' : 's'
         } today!`,
         blocks: [
           {
             type: 'section',
             text: {
               type: 'mrkdwn',
-              text: `📢 *${events.length}* tech event${
-                events.length == 1 ? '' : 's'
+              text: `📢 *${eventsCount}* tech event${
+                eventsCount == 1 ? '' : 's'
               } <https://engineers.sg/events/|today>!`,
             },
           },
