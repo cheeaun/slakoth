@@ -1,6 +1,8 @@
 require('dotenv').config();
 const fs = require('fs');
 const got = require('got');
+const HttpAgent = require('agentkeepalive');
+const { HttpsAgent } = HttpAgent;
 const spacetime = require('spacetime');
 const { WebClient } = require('@slack/web-api');
 const web = new WebClient(process.env.SLACK_TOKEN);
@@ -21,9 +23,24 @@ const generateMessage = async () => {
   const nowDate = spacetime.now(TIMEZONE);
   const newEventsResponse = await got('https://engineers.sg/api/events', {
     json: true,
+    agent: {
+      http: new HttpAgent(),
+      https: new HttpsAgent(),
+    },
   });
+
+  const eventNames = new Set();
   const events = [...newEventsResponse.body.events]
-    .sort((a, b) => new Date(a.start_time) - new Date(b.start_time))
+    .sort((a, b) => {
+      const dateDiff = new Date(a.start_time) - new Date(b.start_time);
+      if (dateDiff !== 0) return dateDiff;
+      const rsvpDiff = b.rsvp_count - a.rsvp_count;
+      if (rsvpDiff !== 0) return rsvpDiff;
+      const locationDiff = b.location.length - a.location.length;
+      if (locationDiff !== 0) return locationDiff;
+      const descDiff = b.description.length - a.description.length;
+      return descDiff;
+    })
     .filter((ev, i) => {
       const eventDate = spacetime(ev.start_time).goto(TIMEZONE);
       if (i == 0) {
@@ -34,27 +51,46 @@ const generateMessage = async () => {
       const sameDay =
         nowDate.format('iso-short') == eventDate.format('iso-short');
 
+      const evName = ev.name.trim();
       const blacklisted =
         blacklistRegex.test(ev.location) ||
         blacklistRegex.test(ev.group_name) ||
-        blacklistRegex.test(ev.name);
+        blacklistRegex.test(evName);
 
       const significantRSVPCount = ev.rsvp_count > 2;
 
       const legit = sameDay && !blacklisted && significantRSVPCount;
+
+      if (eventNames.has(evName)) return false;
+      if (legit) eventNames.add(evName);
+
       return legit;
     })
     .slice(0, 15);
+
+  if (isDev) console.log(events);
 
   // Filter out the non-200 meetups
   const aliveEvents = (
     await Promise.all(
       events.map(ev =>
         got(ev.url, {
-          method: 'HEAD',
-          timeout: 1000,
-          retry: 1,
-        }).then(r => (r.statusCode === 200 ? ev : null)),
+          timeout: 5000,
+          retry: 0,
+          agent: {
+            http: new HttpAgent(),
+            https: new HttpsAgent(),
+          },
+        })
+          .then(r => {
+            if (r.statusCode !== 200) return;
+            const canceled = /eventTimeDisplay\-canceled/i.test(r.body);
+            if (canceled) return;
+            return ev;
+          })
+          .catch(() => {
+            return null;
+          }),
       ),
     )
   ).filter(ev => ev);
