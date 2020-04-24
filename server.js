@@ -10,6 +10,9 @@ const web = new WebClient(process.env.SLACK_TOKEN);
 const isDev = !process.env.NOW_REGION;
 const TIMEZONE = 'Asia/Singapore';
 
+const httpAgent = new HttpAgent();
+const HttpsAgent = new HttpsAgent();
+
 var cycleIndex = 0;
 var cycle = function(list) {
   if (cycleIndex < list.length) cycleIndex++;
@@ -24,8 +27,8 @@ const generateMessage = async () => {
   const newEventsResponse = await got('https://engineers.sg/api/events', {
     json: true,
     agent: {
-      http: new HttpAgent(),
-      https: new HttpsAgent(),
+      http: httpAgent,
+      https: HttpsAgent,
     },
   });
 
@@ -79,8 +82,8 @@ const generateMessage = async () => {
           retry: 0,
           followRedirect: false,
           agent: {
-            http: new HttpAgent(),
-            https: new HttpsAgent(),
+            http: httpAgent,
+            https: httpsAgent,
           },
         })
           .then(r => {
