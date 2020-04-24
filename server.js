@@ -77,6 +77,7 @@ const generateMessage = async () => {
         got(ev.url, {
           timeout: 5000,
           retry: 0,
+          followRedirect: false,
           agent: {
             http: new HttpAgent(),
             https: new HttpsAgent(),
