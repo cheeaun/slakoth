@@ -11,7 +11,7 @@ const isDev = !process.env.NOW_REGION;
 const TIMEZONE = 'Asia/Singapore';
 
 const httpAgent = new HttpAgent();
-const httpsAgent = new HttpsAgent();
+const HttpsAgent = new HttpsAgent();
 
 var cycleIndex = 0;
 var cycle = function(list) {
