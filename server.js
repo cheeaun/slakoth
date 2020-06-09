@@ -108,13 +108,14 @@ const generateMessage = async () => {
         location,
       )}|${shortLocation}>`;
     contextText += ` - ${groupName}`;
+    const eventName = event.name.trim().replace(/[^ -~]+/g, '');
     return {
       blocks: [
         {
           type: 'section',
           text: {
             type: 'mrkdwn',
-            text: `*<${event.url}|${event.name.trim()}>*`,
+            text: `*<${event.url}|${eventName}>*`,
           },
         },
         {
