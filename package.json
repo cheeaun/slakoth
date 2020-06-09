@@ -1,6 +1,6 @@
 {
   "name": "slakoth",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Slack bot to auto-post tech events in Singapore",
   "keywords": [
     "slack",
@@ -12,14 +12,14 @@
   "author": "Lim Chee Aun",
   "license": "ISC",
   "dependencies": {
-    "@slack/web-api": "~5.8.0",
-    "agentkeepalive": "~4.1.0",
+    "@slack/web-api": "~5.10.0",
+    "agentkeepalive": "~4.1.2",
     "dotenv": "~8.2.0",
     "got": "9.6.0",
     "spacetime": "~6.4.3"
   },
   "scripts": {
-    "start": "node server.js",
+    "start": "vercel dev",
     "post": "node server.js --post"
   }
 }

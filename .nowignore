@@ -1,5 +1,5 @@
-*
-!index.html
-!server.js
-!package.json
-!package-lock.json
+node_modules
+.env
+.gitignore
+README.md
+slakoth.png

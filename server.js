@@ -7,11 +7,11 @@ const spacetime = require('spacetime');
 const { WebClient } = require('@slack/web-api');
 const web = new WebClient(process.env.SLACK_TOKEN);
 
-const isDev = !process.env.NOW_REGION;
+const isDev = process.env.NOW_REGION === 'dev1';
 const TIMEZONE = 'Asia/Singapore';
 
 var cycleIndex = 0;
-var cycle = function(list) {
+var cycle = function (list) {
   if (cycleIndex < list.length) cycleIndex++;
   else cycleIndex = 1;
   return list[cycleIndex - 1];
@@ -73,7 +73,7 @@ const generateMessage = async () => {
   // Filter out the non-200 meetups
   const aliveEvents = (
     await Promise.all(
-      events.map(ev =>
+      events.map((ev) =>
         got(ev.url, {
           timeout: 5000,
           retry: 0,
@@ -83,7 +83,7 @@ const generateMessage = async () => {
             https: new HttpsAgent(),
           },
         })
-          .then(r => {
+          .then((r) => {
             if (r.statusCode !== 200) return;
             const canceled = /eventTimeDisplay\-canceled/i.test(r.body);
             if (canceled) return;
@@ -94,9 +94,9 @@ const generateMessage = async () => {
           }),
       ),
     )
-  ).filter(ev => ev);
+  ).filter((ev) => ev);
 
-  const attachments = aliveEvents.map(event => {
+  const attachments = aliveEvents.map((event) => {
     const dt = spacetime(event.start_time).goto(TIMEZONE);
     const time = dt.format('time');
     const groupName = event.group_name.trim().replace(/\*/g, '٭­');
@@ -159,7 +159,7 @@ const generateMessage = async () => {
   return msg;
 };
 
-const postEvents = async channel => {
+const postEvents = async (channel) => {
   const msg = await generateMessage();
   const res = await web.chat.postMessage({
     channel: channel || process.env.SLACK_CHANNEL,
@@ -217,7 +217,5 @@ if (args === '--post') {
 if (isDev) {
   const PORT = process.env.PORT || 1337;
   const listen = () => console.log(`Listening on ${PORT}...`);
-  require('http')
-    .createServer(handler)
-    .listen(PORT, listen);
+  require('http').createServer(handler).listen(PORT, listen);
 }
