@@ -43,13 +43,12 @@ const generateMessage = async () => {
     })
     .filter((ev, i) => {
       const eventDate = spacetime(ev.start_time).goto(TIMEZONE);
+      const isSame = eventDate.isSame(nowDate, 'date');
+      const isAfter = eventDate.isAfter(nowDate);
       if (i == 0) {
-        console.log(
-          `${nowDate.format('iso-short')} ↔️ ${eventDate.format('iso-short')}`,
-        );
+        console.log(`${eventDate.format('iso-short')}: ${isSame} - ${isAfter}`);
       }
-      const sameDay =
-        nowDate.format('iso-short') == eventDate.format('iso-short');
+      const sameDay = isSame && isAfter;
 
       const evName = ev.name.trim();
       const blacklisted =
