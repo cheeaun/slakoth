@@ -22,7 +22,7 @@ const blacklistRegex = /(business|marketing|superbowl|blockchain)/i;
 const generateMessage = async () => {
   const nowDate = spacetime.now(TIMEZONE);
   const newEventsResponse = await got('https://engineers.sg/api/events', {
-    json: true,
+    responseType: 'json',
     agent: {
       http: new HttpAgent(),
       https: new HttpsAgent(),
