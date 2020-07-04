@@ -102,7 +102,7 @@ const generateMessage = async () => {
     const location = event.location.trim().replace(/\*/g, '٭');
     const shortLocation = location.split(',', 1)[0].trim();
     let contextText = `*${time}*`;
-    if (location)
+    if (location && !/^online/i.test(shortLocation))
       contextText += ` - <https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
         location,
       )}|${shortLocation}>`;
