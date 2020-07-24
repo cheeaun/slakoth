@@ -18,7 +18,7 @@ var cycle = function (list) {
 };
 var webuildColors = ['#c11a18', '#e06149', '#228dB7', '#f1e9b4'];
 
-const blocklistRegex = /(business|marketing|superbowl|blockchain|Kakis SG)/i;
+const blocklistRegex = /(business|marketing|superbowl|blockchain|Kakis SG|chainlink|meetnewpeopleSG)/i;
 const generateMessage = async () => {
   const nowDate = spacetime.now(TIMEZONE);
   const newEventsResponse = await got('https://engineers.sg/api/events', {
@@ -54,6 +54,7 @@ const generateMessage = async () => {
       const blacklisted =
         blocklistRegex.test(ev.location) ||
         blocklistRegex.test(ev.group_name) ||
+        blocklistRegex.test(ev.group_url) ||
         blocklistRegex.test(evName);
 
       const significantRSVPCount = ev.rsvp_count > 2;
